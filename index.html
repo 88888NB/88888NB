@@ -2,424 +2,133 @@
 <html lang="zh-CN">
 <head>
 <meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
 <title>XQVIP团队</title>
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
 <style>
-/* 基础重置与变量定义 */
 * {margin: 0;padding: 0;box-sizing: border-box;}
 :root {
---primary: #ff4e50;
---secondary: #f9d423;
---accent: #a8ff78;
---accent2: #78ffd6;
---dark: #0a0a14;
---light: #f0f0ff;
+--primary: #ff4e50;--secondary: #f9d423;--accent: #a8ff78;--accent2: #78ffd6;
+--dark: #0a0a14;--light: #f0f0ff;
 --gradient-1: linear-gradient(135deg, #ff4e50, #f9d423, #a8ff78, #78ffd6);
 --gradient-2: linear-gradient(135deg, #667eea, #764ba2, #f093fb);
 --glow: 0 0 40px currentColor;
 --transition: all 0.5s cubic-bezier(0.175, 0.885, 0.32, 1.275);
-/* 统一反转背面图片链接 */
 --back-image: url('https://1813813973.v.123pan.cn/1813813973/37579730');
 }
-body {
-font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;
-background: var(--dark);
-color: var(--light);
-overflow-x: hidden;
-line-height: 1.7;
-}
-/* WebGL画布容器 */
-#webgl-canvas {
-position: fixed;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-z-index: -3;
-}
-/* 流体背景层 */
-.fluid-layer {
-position: fixed;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-z-index: -2;
-background:
-radial-gradient(circle at 20% 80%, rgba(255, 78, 80, 0.2) 0%, transparent 50%),
-radial-gradient(circle at 80% 20%, rgba(249, 212, 35, 0.2) 0%, transparent 50%),
-radial-gradient(circle at 40% 40%, rgba(168, 255, 120, 0.15) 0%, transparent 50%);
-animation: fluidPulse 20s ease-in-out infinite alternate;
-}
-/* 动态网格背景 */
-.grid-background {
-position: fixed;
-top: 0;
-left: 0;
-width: 200%;
-height: 200%;
-background-image:
-linear-gradient(rgba(255, 255, 255, 0.05) 1px, transparent 1px),
-linear-gradient(90deg, rgba(255, 255, 255, 0.05) 1px, transparent 1px);
-background-size: 50px 50px;
-z-index: -1;
-animation: gridMove 30s linear infinite;
-transform: perspective(500px) rotateX(60deg);
-}
-/* 浮动粒子 */
-.floating-particles {
-position: fixed;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-pointer-events: none;
-z-index: -1;
-}
-.particle {
+body {font-family: 'Segoe UI', 'Microsoft YaHei', sans-serif;background: var(--dark);color: var(--light);overflow-x: hidden;line-height: 1.7;}
+#webgl-canvas {position: fixed;top: 0;left: 0;width: 100%;height: 100%;z-index: -3;}
+.fluid-layer {position: fixed;top: 0;left: 0;width: 100%;height: 100%;z-index: -2;background:radial-gradient(circle at 20% 80%, rgba(255,78,80,0.2)0%,transparent50%),radial-gradient(circle at 80% 20%, rgba(249,212,35,0.2)0%,transparent50%),radial-gradient(circle at 40% 40%, rgba(168,255,120,0.15)0%,transparent50%);animation: fluidPulse 20s ease-in-out infinite alternate;}
+.grid-background {position: fixed;top:0;left:0;width:200%;height:200%;background-image:linear-gradient(rgba(255,255,255,0.05)1px,transparent1px),linear-gradient(90deg,rgba(255,255,255,0.05)1px,transparent1px);background-size:50px 50px;z-index:-1;animation: gridMove 30s linear infinite;transform: perspective(500px) rotateX(60deg);}
+.floating-particles {position: fixed;top:0;left:0;width:100%;height:100%;pointer-events: none;z-index:-1;}
+.particle {position: absolute;width:8px;height:8px;border-radius:50%;background:var(--gradient-1);filter:blur(2px);animation: particleFloat 20s infinite linear;}
+
+/* 雪花样式（明显可见） */
+.snow-container {position: fixed;top:0;left:0;width:100%;height:100%;pointer-events: none;z-index:0;perspective: 800px;}
+.snowflake {
 position: absolute;
 width: 8px;
 height: 8px;
 border-radius: 50%;
-background: var(--gradient-1);
-filter: blur(2px);
-animation: particleFloat 20s infinite linear;
+background: #fff;
+filter: blur(2px) drop-shadow(0 0 3px #a8ff78);
+opacity: 0.9;
+animation: snowFall linear infinite;
 }
-/* 英雄区域 */
-.hero {
-min-height: 100vh;
-display: flex;
-flex-direction: column;
-align-items: center;
-justify-content: center;
-padding: 0 5%;
-position: relative;
-overflow: hidden;
-}
-.hero::before {
-content: '';
-position: absolute;
-top: 50%;
-left: 50%;
-transform: translate(-50%, -50%);
-width: 600px;
-height: 600px;
-background: radial-gradient(circle, rgba(255, 78, 80, 0.3) 0%, transparent 70%);
-filter: blur(100px);
-z-index: -1;
-animation: pulseGlow 4s ease-in-out infinite alternate;
-}
-.hero-title {
-font-size: 5.5rem;
-font-weight: 900;
-background: var(--gradient-1);
--webkit-background-clip: text;
-background-clip: text;
-color: transparent;
-margin-bottom: 4rem;
-text-align: center;
-text-shadow: 0 0 40px currentColor;
-}
-.cta-buttons {
-display: flex;
-flex-direction: column;
-gap: 2rem;
-align-items: center;
-}
-.btn {
-padding: 1.3rem 3.5rem;
-border-radius: 50px;
-font-size: 1.2rem;
-font-weight: 700;
-text-decoration: none;
-display: inline-flex;
-align-items: center;
-gap: 1rem;
-transition: var(--transition);
-position: relative;
-overflow: hidden;
-z-index: 1;
-border: none;
-cursor: pointer;
-}
-.btn::before {
-content: '';
-position: absolute;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-background: inherit;
-filter: brightness(1.2);
-z-index: -1;
-transition: var(--transition);
-}
-/* 保留半透明按钮样式 */
-.btn-secondary {
-background: transparent;
-color: var(--light);
-border: 2px solid rgba(255, 255, 255, 0.3);
-backdrop-filter: blur(10px);
-}
-.btn-secondary:hover {
-background: rgba(255, 255, 255, 0.1);
-border-color: var(--accent);
-transform: translateY(-8px);
-box-shadow: 0 0 40px rgba(168, 255, 120, 0.3);
-}
-/* 服务区域 */
-.services {
-padding: 8rem 5%;
-position: relative;
-}
-.services-grid {
-display: grid;
-grid-template-columns: 1fr;
-gap: 3rem;
-margin-top: 2rem;
-}
-.service-card {
-background: rgba(255, 255, 255, 0.05);
-backdrop-filter: blur(30px);
-border-radius: 30px;
-padding: 3rem;
-border: 1px solid rgba(255, 255, 255, 0.1);
-transition: var(--transition);
-position: relative;
-overflow: hidden;
-transform-style: preserve-3d;
-perspective: 1000px;
-text-align: center;
-}
-.service-card::before {
-content: '';
-position: absolute;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-background: var(--gradient-1);
-opacity: 0;
-transition: opacity 0.6s ease;
-z-index: -1;
-}
-.service-card:hover {
-transform: translateY(-15px) rotateX(5deg) rotateY(5deg) scale(1.02);
-border-color: transparent;
-box-shadow:
-0 20px 40px rgba(0, 0, 0, 0.3),
-0 0 100px rgba(255, 78, 80, 0.2);
-}
-.service-card:hover::before {
-opacity: 0.2;
-}
-.service-icon {
-width: 120px;
-height: 120px;
-background: var(--gradient-1);
-border-radius: 25px;
-margin: 0 auto 2rem;
-transition: var(--transition);
-transform-style: preserve-3d;
-background-size: contain;
-background-position: center;
-background-repeat: no-repeat;
-cursor: pointer;
-}
-/* 关键：所有卡片图标统一添加反转背面样式 */
-.service-icon-custom {
-position: relative;
-backface-visibility: hidden;
-}
-.service-icon-custom::after {
-content: '';
-position: absolute;
-top: 0;
-left: 0;
-width: 100%;
-height: 100%;
-border-radius: 25px;
-/* 统一反转背面图片 + 渐变兜底 */
-background-image: var(--back-image), var(--gradient-2);
-background-size: contain;
-background-position: center;
-background-repeat: no-repeat;
-transform: rotateY(180deg);
-backface-visibility: hidden;
-}
-/* 所有卡片hover时统一反转效果 */
-.service-card:hover .service-icon-custom {
-transform: rotateY(180deg) scale(1.1);
-background: var(--gradient-1);
-}
-.service-link {
-color: var(--accent);
-text-decoration: none;
-font-weight: 700;
-font-size: 1.3rem;
-transition: var(--transition);
-}
-.service-link:hover {
-text-shadow: var(--glow);
-}
-/* 特别鸣谢区域 */
-.thanks {
-padding: 8rem 5% 12rem;
-position: relative;
-text-align: center;
-}
-.thanks-title {
-font-size: 3rem;
-font-weight: 800;
-background: var(--gradient-2);
--webkit-background-clip: text;
-background-clip: text;
-color: transparent;
-margin-bottom: 6rem;
-text-shadow: 0 0 30px currentColor;
-}
-.thanks-grid {
-display: grid;
-grid-template-columns: 1fr 1fr;
-gap: 4rem;
-max-width: 800px;
-margin: 0 auto;
-}
-.thanks-column h3 {
-font-size: 1.8rem;
-color: var(--secondary);
-margin-bottom: 2.5rem;
-position: relative;
-display: inline-block;
-}
-.thanks-column h3::after {
-content: '';
-position: absolute;
-bottom: -10px;
+
+/* 新增：权限请求按钮样式（居中显示，醒目） */
+.permission-button-container {
+position: fixed;
+top: 20px;
 left: 50%;
 transform: translateX(-50%);
-width: 60px;
-height: 3px;
-background: var(--secondary);
-border-radius: 3px;
+z-index: 9999; /* 最上层，确保能点到 */
 }
-.thanks-list {
-display: flex;
-flex-direction: column;
-gap: 1.5rem;
-}
-.thanks-item {
-font-size: 1.3rem;
-color: var(--light);
+#requestPermission {
+padding: 1rem 2rem;
+border-radius: 30px;
+background: linear-gradient(135deg, var(--accent), var(--accent2));
+color: var(--dark);
+font-weight: 700;
+border: none;
+cursor: pointer;
+box-shadow: 0 0 20px rgba(168, 255, 120, 0.5);
 transition: var(--transition);
-padding: 0.8rem 0;
-position: relative;
 }
-.thanks-item::before {
-content: '✦';
+#requestPermission:hover {
+transform: scale(1.05);
+box-shadow: 0 0 30px rgba(168, 255, 120, 0.7);
+}
+#permissionStatus {
+margin-top: 10px;
 color: var(--accent);
-margin-right: 1rem;
+font-size: 0.9rem;
+text-align: center;
 text-shadow: 0 0 10px var(--accent);
 }
-.thanks-item:hover {
-color: var(--accent2);
-transform: translateX(10px);
-text-shadow: 0 0 20px var(--accent2);
-}
-/* 动画定义 */
-@keyframes fluidPulse {
-0%, 100% {
-transform: scale(1) rotate(0deg);
-filter: hue-rotate(0deg);
-}
-33% {
-transform: scale(1.1) rotate(120deg);
-filter: hue-rotate(120deg);
-}
-66% {
-transform: scale(0.9) rotate(240deg);
-filter: hue-rotate(240deg);
-}
-}
-@keyframes gridMove {
-0% {
-transform: perspective(500px) rotateX(60deg) translateY(0);
-}
-100% {
-transform: perspective(500px) rotateX(60deg) translateY(50px);
-}
-}
-@keyframes pulseGlow {
-0% {
-opacity: 0.5;
-filter: blur(100px);
-}
-100% {
-opacity: 0.8;
-filter: blur(150px);
-}
-}
-@keyframes particleFloat {
-0% {
-transform: translate(0, 0) rotate(0deg);
-opacity: 0;
-}
-10% {
-opacity: 1;
-}
-90% {
-opacity: 1;
-}
-100% {
-transform: translate(calc(100vw * var(--tx)), calc(100vh * var(--ty))) rotate(360deg);
-opacity: 0;
-}
-}
-/* 响应式设计 */
-@media (max-width: 768px) {
-.hero-title {
-font-size: 3.5rem;
-}
-.btn {
-padding: 1rem 2.5rem;
-font-size: 1.1rem;
-}
-.service-card {
-padding: 2rem;
-}
-.service-icon {
-width: 100px;
-height: 100px;
-}
-.thanks-title {
-font-size: 2.5rem;
-margin-bottom: 4rem;
-}
-.thanks-grid {
-grid-template-columns: 1fr;
-gap: 3rem;
-}
-.thanks-column h3 {
-font-size: 1.6rem;
-}
-.thanks-item {
-font-size: 1.2rem;
-}
+
+.hero {min-height:100vh;display:flex;flex-direction:column;align-items:center;justify-content:center;padding:0 5%;position:relative;overflow:hidden;}
+.hero::before {content:'';position:absolute;top:50%;left:50%;transform:translate(-50%,-50%);width:600px;height:600px;background:radial-gradient(circle,rgba(255,78,80,0.3)0%,transparent70%);filter:blur(100px);z-index:-1;animation: pulseGlow 4s ease-in-out infinite alternate;}
+.hero-title {font-size:5.5rem;font-weight:900;background:var(--gradient-1);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:4rem;text-align:center;text-shadow:0 0 40px currentColor;}
+.cta-buttons {display:flex;flex-direction:column;gap:2rem;align-items:center;}
+.btn {padding:1.3rem 3.5rem;border-radius:50px;font-size:1.2rem;font-weight:700;text-decoration:none;display:inline-flex;align-items:center;gap:1rem;transition:var(--transition);position:relative;overflow:hidden;z-index:1;border:none;cursor:pointer;}
+.btn::before {content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:inherit;filter:brightness(1.2);z-index:-1;transition:var(--transition);}
+.btn-secondary {background:transparent;color:var(--light);border:2px solid rgba(255,255,255,0.3);backdrop-filter:blur(10px);}
+.btn-secondary:hover {background:rgba(255,255,255,0.1);border-color:var(--accent);transform:translateY(-8px);box-shadow:0 0 40px rgba(168,255,120,0.3);}
+.services {padding:8rem 5%;position:relative;}
+.services-grid {display:grid;grid-template-columns:1fr;gap:3rem;margin-top:2rem;}
+.service-card {background:rgba(255,255,255,0.05);backdrop-filter:blur(30px);border-radius:30px;padding:3rem;border:1px solid rgba(255,255,255,0.1);transition:var(--transition);position:relative;overflow:hidden;transform-style:preserve-3d;perspective:1000px;text-align:center;z-index:1;}
+.service-card::before {content:'';position:absolute;top:0;left:0;width:100%;height:100%;background:var(--gradient-1);opacity:0;transition:opacity 0.6s ease;z-index:-1;}
+.service-card:hover {transform:translateY(-15px) rotateX(5deg) rotateY(5deg) scale(1.02);border-color:transparent;box-shadow:0 20px 40px rgba(0,0,0,0.3),0 0 100px rgba(255,78,80,0.2);}
+.service-card:hover::before {opacity:0.2;}
+.service-icon {width:120px;height:120px;background:var(--gradient-1);border-radius:25px;margin:0 auto 2rem;transition:var(--transition);transform-style:preserve-3d;background-size:contain;background-position:center;background-repeat:no-repeat;cursor:pointer;}
+.service-icon-custom {position:relative;backface-visibility:hidden;}
+.service-icon-custom::after {content:'';position:absolute;top:0;left:0;width:100%;height:100%;border-radius:25px;background-image:var(--back-image),var(--gradient-2);background-size:contain;background-position:center;background-repeat:no-repeat;transform:rotateY(180deg);backface-visibility:hidden;}
+.service-card:hover .service-icon-custom {transform:rotateY(180deg) scale(1.1);background:var(--gradient-1);}
+.service-link {color:var(--accent);text-decoration:none;font-weight:700;font-size:1.3rem;transition:var(--transition);}
+.service-link:hover {text-shadow:var(--glow);}
+.thanks {padding:8rem 5% 12rem;position:relative;text-align:center;}
+.thanks-title {font-size:3rem;font-weight:800;background:var(--gradient-2);-webkit-background-clip:text;background-clip:text;color:transparent;margin-bottom:6rem;text-shadow:0 0 30px currentColor;}
+.thanks-grid {display:grid;grid-template-columns:1fr 1fr;gap:4rem;max-width:800px;margin:0 auto;}
+.thanks-column h3 {font-size:1.8rem;color:var(--secondary);margin-bottom:2.5rem;position:relative;display:inline-block;}
+.thanks-column h3::after {content:'';position:absolute;bottom:-10px;left:50%;transform:translateX(-50%);width:60px;height:3px;background:var(--secondary);border-radius:3px;}
+.thanks-list {display:flex;flex-direction:column;gap:1.5rem;}
+.thanks-item {font-size:1.3rem;color:var(--light);transition:var(--transition);padding:0.8rem 0;position:relative;}
+.thanks-item::before {content:'✦';color:var(--accent);margin-right:1rem;text-shadow:0 0 10px var(--accent);}
+.thanks-item:hover {color:var(--accent2);transform:translateX(10px);text-shadow:0 0 20px var(--accent2);}
+
+@keyframes fluidPulse {0%,100%{transform:scale(1) rotate(0deg);filter:hue-rotate(0deg);}33%{transform:scale(1.1) rotate(120deg);filter:hue-rotate(120deg);}66%{transform:scale(0.9) rotate(240deg);filter:hue-rotate(240deg);}}
+@keyframes gridMove {0%{transform:perspective(500px) rotateX(60deg) translateY(0);}100%{transform:perspective(500px) rotateX(60deg) translateY(50px);}}
+@keyframes pulseGlow {0%{opacity:0.5;filter:blur(100px);}100%{opacity:0.8;filter:blur(150px);}}
+@keyframes particleFloat {0%{transform:translate(0,0) rotate(0deg);opacity:0;}10%{opacity:1;}90%{opacity:1;}100%{transform:translate(calc(100vw*var(--tx)),calc(100vh*var(--ty))) rotate(360deg);opacity:0;}}
+@keyframes snowFall {0%{transform:translateY(-10px);opacity:0.9;}100%{transform:translateY(100vh);opacity:0;}}
+
+@media (max-width:768px) {
+.hero-title {font-size:3.5rem;}
+.btn {padding:1rem 2.5rem;font-size:1.1rem;}
+.service-card {padding:2rem;}
+.service-icon {width:100px;height:100px;}
+.thanks-title {font-size:2.5rem;margin-bottom:4rem;}
+.thanks-grid {grid-template-columns:1fr;gap:3rem;}
+.thanks-column h3 {font-size:1.6rem;}
+.thanks-item {font-size:1.2rem;}
+.snowflake {width:6px;height:6px;}
 }
 </style>
 </head>
 <body>
-<!-- WebGL画布 -->
 <canvas id="webgl-canvas"></canvas>
-<!-- 流体背景层 -->
 <div class="fluid-layer"></div>
-<!-- 动态网格背景 -->
 <div class="grid-background"></div>
-<!-- 浮动粒子 -->
 <div class="floating-particles" id="floatingParticles"></div>
+<div class="snow-container" id="snowContainer"></div>
 
-<!-- 英雄区域 -->
+<!-- 新增：权限请求按钮 -->
+<div class="permission-button-container">
+<button id="requestPermission">点击开启陀螺仪权限</button>
+<div id="permissionStatus">请先授权以启用雪花跟随</div>
+</div>
+
 <section class="hero">
 <h1 class="hero-title">XQVIP团队</h1>
 <div class="cta-buttons">
@@ -430,25 +139,20 @@ font-size: 1.2rem;
 </div>
 </section>
 
-<!-- 服务区域 -->
 <section class="services">
 <div class="services-grid">
-<!-- 第1张卡片 -->
 <div class="service-card">
 <div class="service-icon service-icon-custom" style="background-image: url('https://1813813973.v.123pan.cn/1813813973/37583091'), var(--gradient-1);" onclick="window.open('https://1813813973.v.123pan.cn/1813813973/41122933', '_blank')"></div>
 <a href="#" class="service-link">XQVIP Ultra下载</a>
 </div>
-<!-- 第2张卡片 -->
 <div class="service-card">
 <div class="service-icon service-icon-custom" style="background-image: url('https://1813813973.v.123pan.cn/1813813973/41799551'), var(--gradient-1);" onclick="window.open('https://1813813973.v.123pan.cn/1813813973/41467979', '_blank')"></div>
 <a href="#" class="service-link">XQVIP专属框架下载</a>
 </div>
-<!-- 第3张卡片 -->
 <div class="service-card">
 <div class="service-icon service-icon-custom" style="background-image: url('https://1813813973.v.123pan.cn/1813813973/41799555'), var(--gradient-1);" onclick="window.open('https://1813813973.v.123pan.cn/1813813973/40969404', '_blank')"></div>
 <a href="#" class="service-link">专属诅咒游戏安装包</a>
 </div>
-<!-- 第4张卡片 -->
 <div class="service-card">
 <div class="service-icon service-icon-custom" style="background-image: url('https://1813813973.v.123pan.cn/1813813973/37579730'), var(--gradient-1);" onclick="window.open('https://1813813973.v.123pan.cn/1813813973/40993614', '_blank')"></div>
 <a href="#" class="service-link">XQVIP官网下载</a>
@@ -456,7 +160,6 @@ font-size: 1.2rem;
 </div>
 </section>
 
-<!-- 特别鸣谢区域 -->
 <section class="thanks">
 <h2 class="thanks-title">特别鸣谢</h2>
 <div class="thanks-grid">
@@ -480,188 +183,169 @@ font-size: 1.2rem;
 </section>
 
 <script>
-// 页面加载完成后执行
 document.addEventListener('DOMContentLoaded', function() {
 const floatingParticles = document.getElementById('floatingParticles');
+const snowContainer = document.getElementById('snowContainer');
+const requestPermissionBtn = document.getElementById('requestPermission');
+const permissionStatus = document.getElementById('permissionStatus');
+let permissionGranted = false; // 权限状态标记
 
-// 创建浮动粒子
+// 创建浮动粒子（原有功能）
 function createFloatingParticles() {
 const particleCount = 50;
 for (let i = 0; i < particleCount; i++) {
 const particle = document.createElement('div');
 particle.classList.add('particle');
-// 随机属性
-const size = Math.random() * 10 + 5;
-const posX = Math.random() * 100;
-const posY = Math.random() * 100;
-const delay = Math.random() * 20;
-const duration = Math.random() * 30 + 20;
-const tx = Math.random() * 2 - 1;
-const ty = Math.random() * 2 - 1;
-// 应用样式
-particle.style.width = `${size}px`;
-particle.style.height = `${size}px`;
-particle.style.left = `${posX}vw`;
-particle.style.top = `${posY}vh`;
-particle.style.animationDelay = `${delay}s`;
-particle.style.animationDuration = `${duration}s`;
-particle.style.setProperty('--tx', tx);
-particle.style.setProperty('--ty', ty);
-// 随机渐变背景
-const gradients = [
-'linear-gradient(135deg, #ff4e50, #f9d423)',
-'linear-gradient(135deg, #a8ff78, #78ffd6)',
-'linear-gradient(135deg, #667eea, #764ba2)',
-'linear-gradient(135deg, #4facfe, #00f2fe)'
-];
-particle.style.background = gradients[Math.floor(Math.random() * gradients.length)];
+const size = Math.random()*10+5;const posX=Math.random()*100;const posY=Math.random()*100;
+const delay=Math.random()*20;const duration=Math.random()*30+20;const tx=Math.random()*2-1;const ty=Math.random()*2-1;
+particle.style.width=`${size}px`;particle.style.height=`${size}px`;particle.style.left=`${posX}vw`;particle.style.top=`${posY}vh`;
+particle.style.animationDelay=`${delay}s`;particle.style.animationDuration=`${duration}s`;
+particle.style.setProperty('--tx',tx);particle.style.setProperty('--ty',ty);
+const gradients=['linear-gradient(135deg, #ff4e50, #f9d423)','linear-gradient(135deg, #a8ff78, #78ffd6)','linear-gradient(135deg, #667eea, #764ba2)','linear-gradient(135deg, #4facfe, #00f2fe)'];
+particle.style.background=gradients[Math.floor(Math.random()*gradients.length)];
 floatingParticles.appendChild(particle);
 }
 }
 
-// 鼠标移动效果
-document.addEventListener('mousemove', (e) => {
-const x = (e.clientX / window.innerWidth - 0.5) * 20;
-const y = (e.clientY / window.innerHeight - 0.5) * 20;
-// 背景层视差
-const fluidLayer = document.querySelector('.fluid-layer');
-if (fluidLayer) {
-fluidLayer.style.transform = `translate(${x}px, ${y}px)`;
+// 创建雪花（150个，密集可见）
+function createSnowflakes() {
+const snowCount = 150;
+for(let i=0; i<snowCount; i++) {
+const snow = document.createElement('div');
+snow.classList.add('snowflake');
+const size = Math.random()*4 + 6;
+const left = Math.random()*100;
+const top = Math.random()*100;
+const duration = Math.random()*15 + 8;
+snow.style.width = `${size}px`;
+snow.style.height = `${size}px`;
+snow.style.left = `${left}vw`;
+snow.style.top = `${top}vh`;
+snow.style.animationDuration = `${duration}s`;
+snow.style.animationDelay = `${Math.random()*10}s`;
+snowContainer.appendChild(snow);
 }
-// 卡片轻微倾斜
+}
+
+// 核心修复：雪花跟随手机方向（带权限检查）
+function snowFollowTilt(e) {
+if (!permissionGranted) return; // 没授权不执行
+
+const gamma = e.gamma || 0; // 左右倾斜（-90~90）
+const beta = e.beta || 0;   // 前后倾斜（-180~180）
+
+// 灵敏度调整（分母越小越灵敏，现在很明显）
+const moveX = gamma / 2; 
+const moveY = beta / 3;
+
+// 所有雪花跟随移动
+const allSnow = document.querySelectorAll('.snowflake');
+allSnow.forEach(snow => {
+snow.style.transform = `translate(${moveX}px, ${moveY}px)`;
+});
+}
+
+// 核心修复：请求设备方向权限（必须用户点击后执行）
+async function requestOrientationPermission() {
+try {
+// 现代浏览器（iOS 13+/Chrome 85+）支持显式请求权限
+if (DeviceOrientationEvent && DeviceOrientationEvent.requestPermission) {
+const permission = await DeviceOrientationEvent.requestPermission();
+if (permission === 'granted') {
+permissionGranted = true;
+permissionStatus.textContent = '✅ 权限已授权，倾斜手机控制雪花';
+requestPermissionBtn.disabled = true;
+requestPermissionBtn.style.opacity = 0.5;
+// 权限通过后才监听方向事件
+window.addEventListener('deviceorientation', snowFollowTilt);
+} else {
+permissionStatus.textContent = '❌ 权限被拒绝，无法使用雪花跟随';
+}
+} else {
+// 旧浏览器自动授权
+permissionGranted = true;
+permissionStatus.textContent = '✅ 自动授权成功，倾斜手机控制雪花';
+requestPermissionBtn.style.display = 'none';
+window.addEventListener('deviceorientation', snowFollowTilt);
+}
+} catch (error) {
+permissionStatus.textContent = `❌ 授权出错: ${error.message}`;
+console.error('权限请求失败:', error);
+}
+}
+
+// 绑定按钮点击事件（必须用户主动点击）
+requestPermissionBtn.addEventListener('click', requestOrientationPermission);
+
+// 原有鼠标交互
+document.addEventListener('mousemove', (e) => {
+const x = (e.clientX/window.innerWidth -0.5)*20;
+const y = (e.clientY/window.innerHeight -0.5)*20;
+const fluidLayer = document.querySelector('.fluid-layer');
+if(fluidLayer) fluidLayer.style.transform = `translate(${x}px, ${y}px)`;
 const cards = document.querySelectorAll('.service-card');
 cards.forEach(card => {
 const rect = card.getBoundingClientRect();
 const cardX = e.clientX - rect.left;
 const cardY = e.clientY - rect.top;
-const rotateY = (cardX / rect.width - 0.5) * 10;
-const rotateX = (0.5 - cardY / rect.height) * 10;
+const rotateY = (cardX/rect.width -0.5)*10;
+const rotateX = (0.5 - cardY/rect.height)*10;
 card.style.transform = `perspective(1000px) rotateX(${rotateX}deg) rotateY(${rotateY}deg)`;
 });
-// 鸣谢列表轻微位移
 const thanksItems = document.querySelectorAll('.thanks-item');
-thanksItems.forEach((item, index) => {
-const offsetX = (e.clientX / window.innerWidth - 0.5) * 5;
-const offsetY = (e.clientY / window.innerHeight - 0.5) * 5;
+thanksItems.forEach((item,index) => {
+const offsetX = (e.clientX/window.innerWidth -0.5)*5;
+const offsetY = (e.clientY/window.innerHeight -0.5)*5;
 item.style.transform = `translate(${offsetX}px, ${offsetY}px)`;
 });
 });
-
-// 鼠标移出时重置元素
 document.addEventListener('mouseleave', () => {
 const cards = document.querySelectorAll('.service-card');
-cards.forEach(card => {
-card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)';
-});
+cards.forEach(card => card.style.transform = 'perspective(1000px) rotateX(0) rotateY(0)');
 const thanksItems = document.querySelectorAll('.thanks-item');
-thanksItems.forEach(item => {
-item.style.transform = 'translate(0, 0)';
-});
+thanksItems.forEach(item => item.style.transform = 'translate(0,0)');
 });
 
-// 简单的WebGL背景
+// WebGL背景（原有功能）
 function initWebGL() {
 const canvas = document.getElementById('webgl-canvas');
 const gl = canvas.getContext('webgl') || canvas.getContext('experimental-webgl');
-if (!gl) {
-console.log('WebGL not supported, falling back on experimental-webgl');
-return;
-}
-// 设置画布尺寸
-function resizeCanvas() {
-canvas.width = window.innerWidth;
-canvas.height = window.innerHeight;
-gl.viewport(0, 0, canvas.width, canvas.height);
-}
-window.addEventListener('resize', resizeCanvas);
-resizeCanvas();
-// 顶点着色器
-const vertexShaderSource = `
-attribute vec2 a_position;
-void main() {
-gl_Position = vec4(a_position, 0.0, 1.0);
-gl_PointSize = 2.0;
-}
-`;
-// 片段着色器
-const fragmentShaderSource = `
-precision mediump float;
-uniform float u_time;
-void main() {
-vec2 uv = gl_PointCoord;
-float d = length(uv - vec2(0.5));
-float alpha = 1.0 - smoothstep(0.4, 0.5, d);
-vec3 color = vec3(
-0.5 + 0.5 * sin(u_time + uv.x * 3.0),
-0.5 + 0.5 * sin(u_time + uv.y * 3.0 + 1.0),
-0.5 + 0.5 * sin(u_time + uv.x * uv.y + 2.0)
-);
-gl_FragColor = vec4(color, alpha * 0.1);
-}
-`;
-// 创建着色器程序
-function createShader(gl, type, source) {
-const shader = gl.createShader(type);
-gl.shaderSource(shader, source);
-gl.compileShader(shader);
-if (!gl.getShaderParameter(shader, gl.COMPILE_STATUS)) {
-console.error('Shader compile error:', gl.getShaderInfoLog(shader));
-gl.deleteShader(shader);
-return null;
-}
+if(!gl) {console.log('WebGL not supported');return;}
+function resizeCanvas() {canvas.width=window.innerWidth;canvas.height=window.innerHeight;gl.viewport(0,0,canvas.width,canvas.height);}
+window.addEventListener('resize', resizeCanvas);resizeCanvas();
+const vertexShaderSource = `attribute vec2 a_position;void main(){gl_Position=vec4(a_position,0.0,1.0);gl_PointSize=2.0;}`;
+const fragmentShaderSource = `precision mediump float;uniform float u_time;void main(){vec2 uv=gl_PointCoord;float d=length(uv-vec2(0.5));float alpha=1.0-smoothstep(0.4,0.5,d);vec3 color=vec3(0.5+0.5*sin(u_time+uv.x*3.0),0.5+0.5*sin(u_time+uv.y*3.0+1.0),0.5+0.5*sin(u_time+uv.x*uv.y+2.0));gl_FragColor=vec4(color,alpha*0.1);}`;
+function createShader(gl,type,source) {
+const shader=gl.createShader(type);gl.shaderSource(shader,source);gl.compileShader(shader);
+if(!gl.getShaderParameter(shader,gl.COMPILE_STATUS)){console.error(gl.getShaderInfoLog(shader));gl.deleteShader(shader);return null;}
 return shader;
 }
-const vertexShader = createShader(gl, gl.VERTEX_SHADER, vertexShaderSource);
-const fragmentShader = createShader(gl, gl.FRAGMENT_SHADER, fragmentShaderSource);
-const program = gl.createProgram();
-gl.attachShader(program, vertexShader);
-gl.attachShader(program, fragmentShader);
-gl.linkProgram(program);
-if (!gl.getProgramParameter(program, gl.LINK_STATUS)) {
-console.error('Program link error:', gl.getProgramInfoLog(program));
-return;
-}
+const vertexShader=createShader(gl,gl.VERTEX_SHADER,vertexShaderSource);
+const fragmentShader=createShader(gl,gl.FRAGMENT_SHADER,fragmentShaderSource);
+const program=gl.createProgram();gl.attachShader(program,vertexShader);gl.attachShader(program,fragmentShader);gl.linkProgram(program);
+if(!gl.getProgramParameter(program,gl.LINK_STATUS)){console.error(gl.getProgramInfoLog(program));return;}
 gl.useProgram(program);
-// 创建粒子位置
-const particleCount = 1000;
-const positions = new Float32Array(particleCount * 2);
-for (let i = 0; i < particleCount * 2; i += 2) {
-positions[i] = Math.random() * 2 - 1;     // x: -1 to 1
-positions[i + 1] = Math.random() * 2 - 1; // y: -1 to 1
+const particleCount=1000;const positions=new Float32Array(particleCount*2);
+for(let i=0;i<particleCount*2;i+=2){positions[i]=Math.random()*2-1;positions[i+1]=Math.random()*2-1;}
+const positionBuffer=gl.createBuffer();gl.bindBuffer(gl.ARRAY_BUFFER,positionBuffer);gl.bufferData(gl.ARRAY_BUFFER,positions,gl.STATIC_DRAW);
+const positionAttributeLocation=gl.getAttribLocation(program,'a_position');
+gl.enableVertexAttribArray(positionAttributeLocation);gl.vertexAttribPointer(positionAttributeLocation,2,gl.FLOAT,false,0,0);
+const timeUniformLocation=gl.getUniformLocation(program,'u_time');
+let time=0;function animate(){time+=0.01;
+for(let i=0;i<particleCount*2;i+=2){
+positions[i]+=Math.sin(time+positions[i+1])*0.001;
+positions[i+1]+=Math.cos(time+positions[i])*0.001;
+if(positions[i]>1)positions[i]=-1;if(positions[i]<-1)positions[i]=1;
+if(positions[i+1]>1)positions[i+1]=-1;if(positions[i+1]<-1)positions[i+1]=1;
 }
-const positionBuffer = gl.createBuffer();
-gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-gl.bufferData(gl.ARRAY_BUFFER, positions, gl.STATIC_DRAW);
-const positionAttributeLocation = gl.getAttribLocation(program, 'a_position');
-gl.enableVertexAttribArray(positionAttributeLocation);
-gl.vertexAttribPointer(positionAttributeLocation, 2, gl.FLOAT, false, 0, 0);
-const timeUniformLocation = gl.getUniformLocation(program, 'u_time');
-// 动画循环
-let time = 0;
-function animate() {
-time += 0.01;
-// 更新粒子位置
-for (let i = 0; i < particleCount * 2; i += 2) {
-positions[i] += Math.sin(time + positions[i + 1]) * 0.001;
-positions[i + 1] += Math.cos(time + positions[i]) * 0.001;
-// 边界处理
-if (positions[i] > 1) positions[i] = -1;
-if (positions[i] < -1) positions[i] = 1;
-if (positions[i + 1] > 1) positions[i + 1] = -1;
-if (positions[i + 1] < -1) positions[i + 1] = 1;
-}
-gl.bindBuffer(gl.ARRAY_BUFFER, positionBuffer);
-gl.bufferData(gl.ARRAY_BUFFER, positions, gl.DYNAMIC_DRAW);
-gl.uniform1f(timeUniformLocation, time);
-gl.clear(gl.COLOR_BUFFER_BIT);
-gl.drawArrays(gl.POINTS, 0, particleCount);
-requestAnimationFrame(animate);
-}
-animate();
+gl.bindBuffer(gl.ARRAY_BUFFER,positionBuffer);gl.bufferData(gl.ARRAY_BUFFER,positions,gl.DYNAMIC_DRAW);
+gl.uniform1f(timeUniformLocation,time);gl.clear(gl.COLOR_BUFFER_BIT);gl.drawArrays(gl.POINTS,0,particleCount);requestAnimationFrame(animate);
+}animate();
 }
 
 // 初始化
 createFloatingParticles();
+createSnowflakes();
 initWebGL();
 });
 </script>
