@@ -78,8 +78,12 @@ margin: -1rem 0;
 z-index: 0;
 }
 
-/* 服务区域 */
-.services {padding:0 5% 8rem;position:relative;}
+/* 服务区域 - 核心修改：增加顶部间距，拉开与按钮的距离 */
+.services {
+padding: 3rem 5% 8rem; /* 顶部padding从0改为3rem，增加与按钮的间距 */
+position:relative;
+margin-top: 1rem; /* 去掉负margin，再增加1rem间距 */
+}
 .services-grid {
 display:grid;grid-template-columns:1fr;gap:3rem;
 margin-top: -1rem;
@@ -124,6 +128,7 @@ transform:rotateY(180deg);backface-visibility:hidden;
 .hero-title {font-size:3.5rem;}
 .btn {padding:1rem 2.5rem;font-size:1.1rem;}
 .section-divider {height: 40px;}
+.services {padding:2rem 5% 8rem;} /* 响应式下顶部间距同步调整 */
 .service-card {padding:2rem;}
 .service-icon {width:100px;height:100px;}
 .thanks-title {font-size:2.5rem;margin-bottom:4rem;}
@@ -146,6 +151,8 @@ transform:rotateY(180deg);backface-visibility:hidden;
 <a href="https://pd.qq.com/s/6bl8cqaey?b=9" target="_blank" class="btn btn-secondary">XQ社区</a>
 <a href="https://ds.xiaoman.top/links/30D2E30A" target="_blank" class="btn btn-secondary">卡密购买</a>
 <a href="https://qun.qq.com/universal-share/share?ac=1&authKey=3D09P2t9%2F%2FWGOX22FRGqYMVu0ulV0iuuUFhn4hLRMQDVNt2epJCYpPz1cfX2AZXp&busi_data=eyJncm91cENvZGUiOiI2MjQ3ODA2NTgiLCJ0b2tlbiI6Ii9VZnZYSGRxMTZqekZEWEp2RlZYT1lhdC9OdmFmNnJPY3MvYjNKWFB5QjlKNkhxREprZUQ1YW8zdTlZM0hjYWoiLCJ1aW4iOiIxNzQzNjI4MjcxIn0%3D&data=n-jD8Ky8fgaQ60uyyNiuI4Y6Zpbxrya5D2d4zpdkH8WLyIa1beBBj2A0f1Yab_m7tuwZMBseCLXqIvoZp27QBg&svctype=4&tempid=h5_group_info" target="_blank" class="btn btn-secondary">总群加入</a>
+<!-- 新增分群加入按钮（与原UI样式完全一致） -->
+<a href="https://qun.qq.com/universal-share/share?ac=1&authKey=8mTORASjMjLUkiyhX1BswmTGSgxF8RofrYKBW2Ia4Ib%2FJmjapShSjj%2FExEZsGRGP&busi_data=eyJncm91cENvZGUiOiIyMzc2NzUxNzMiLCJ0b2tlbiI6IlMrR0paV0hiTUQ3VVZGb290cjczd1p2TmhOZVNJOGtjK1k4OHM3Yndib0k5YnVtM3hIRkpINk5uOWQrYXFHSnoiLCJ1aW4iOiIyODY0MTUyODY5In0%3D&data=oqq1v6R6uorVn_9LztHNgZmDN-yyB0H6bl7fmW_bid7cesdiZYxyuECeiYCeWHg9C3QazRWXYhdmuJ8NdIkFlA&svctype=4&tempid=h5_group_info" target="_blank" class="btn btn-secondary">分群加入</a>
 <!-- 已替换为新视频链接 -->
 <a href="https://1813813973.v.123pan.cn/1813813973/41866628" target="_blank" class="btn btn-secondary">完整教程视频</a>
 </div>
